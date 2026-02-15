@@ -1,0 +1,2 @@
+"""docs_splitter package."""
+

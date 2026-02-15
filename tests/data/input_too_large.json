@@ -1,0 +1,18 @@
+{
+  "doc_id": "sample-doc",
+  "max_tokens": 10,
+  "pages": [
+    "この段落はトークン上限を超える長い文章です。",
+    "2ページ目",
+    "3ページ目"
+  ],
+  "toc": [
+    {
+      "level": 1,
+      "title": "第1章",
+      "page_start": 1,
+      "children": []
+    }
+  ]
+}
+
