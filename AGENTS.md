@@ -82,6 +82,11 @@
 - 各ユニットの `page_end` は次の同一 `split_level` エントリの `page_start - 1`（最後は `total_pages`）で決まる。先頭エントリが1ページ目より後なら、その手前は自動的に `unclassified` になる。
 - 境界照合は「ページの最初の非空行」対「TOCタイトル」の空白除去完全一致のみを自動一致とする（あいまい候補提示は初回スコープ外）。
 - `execute_split` は `review_items` が残る状態で `confirmed=False`（CLIでは `--confirm-reviewed` 未指定）だと `REVIEW_REQUIRED` で拒否する。
+- 実物PDFでは、まずしおり（`PdfReader(path).outline` と `get_destination_page_number`）からTOC案を作る。印刷目次を画像で読むのは、しおりがない時だけにする。画像から読んだタイトルは誤読しうるため、しおりか `pdftotext -f N -l N` と照合する。詳細は `wiki/index.md`。
+- pypdfは日本語を文字化けさせる。境界照合も実物ではほぼ全件 `mismatched` になる（柱・ノンブルが1行目に来るため）。本文の確認は `pdftotext` で行い、画像化（`pdftoppm`）はテキストで確認できないページだけにする。
+- CLIのstderrはpypdfのfontTools警告であふれる。`| grep -v` で除外して `$?` を見ない（grepの終了コードになる）。`2>file` に逃がして、CLIの終了コードをそのまま確認する。
+- loop_guardの60分には権限承認の待ち時間も含まれる。承認が要るコマンドは早めに出す。成果物はscratchpad（セッション単位）ではなく、元PDFの隣など残る場所へ出す。停止後はRead系で成果物（`plan.json` の更新時刻・中身）を確認してから停止理由を書く。
+- 再開時は `tasks/` の停止報告を鵜呑みにしない。前セッションのtranscript（`~/.claude/projects/-home-vega-ghq-github-com-ksoda-docs-splitter/<session>.jsonl`）を読んで事実を確かめる。
 - テストは `.venv`（`uv venv .venv && uv pip install --python .venv/bin/python pypdf reportlab`）経由の `python3` が前提。system の `python3` は externally-managed のため pypdf を直接入れられない。実行方法変更時は `README.md` と `tests/test_e2e.py` を同時に更新する。
 
 ## Maintenance Notes
