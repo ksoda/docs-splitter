@@ -1,18 +1,17 @@
 {
-  "doc_id": "sample-doc",
-  "max_tokens": 10,
-  "pages": [
-    "この段落はトークン上限を超える長い文章です。",
-    "2ページ目",
-    "3ページ目"
-  ],
+  "doc_id": "sample-magazine",
+  "pdf_path": "tests/data/sample_magazine.pdf",
+  "split_level": 1,
   "toc": [
     {
       "level": 1,
-      "title": "第1章",
-      "page_start": 1,
-      "children": []
+      "title": "特集A",
+      "page_start": 2
+    },
+    {
+      "level": 1,
+      "title": "特集B",
+      "page_start": 99
     }
   ]
 }
-

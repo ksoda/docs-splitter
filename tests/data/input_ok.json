@@ -1,24 +1,27 @@
 {
-  "doc_id": "sample-doc",
-  "max_tokens": 30,
-  "pages": [
-    "第1章 イントロ。\n\n概要を説明する。",
-    "詳細を説明する。\n\n追加の説明。",
-    "第2章 実装。\n\n設計を記述する。"
-  ],
+  "doc_id": "sample-magazine",
+  "pdf_path": "tests/data/sample_magazine.pdf",
+  "split_level": 1,
   "toc": [
     {
       "level": 1,
-      "title": "第1章",
-      "page_start": 1,
-      "children": []
+      "title": "特集A",
+      "page_start": 2
+    },
+    {
+      "level": 2,
+      "title": "特集A 第1章",
+      "page_start": 3
     },
     {
       "level": 1,
-      "title": "第2章",
-      "page_start": 3,
-      "children": []
+      "title": "特集B",
+      "page_start": 4
+    },
+    {
+      "level": 2,
+      "title": "特集B 第1章",
+      "page_start": 5
     }
   ]
 }
-
