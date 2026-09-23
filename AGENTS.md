@@ -27,6 +27,8 @@
 
 - 自律ループはCLIのClaude Codeで動かす（例: `claude --remote-control "docs-splitter"`）。判断の根拠はdevelopment-disciplineの `docs/first-pilot-conditions.md`（N-05）。
 - 既定モデルは `opusplan`（計画モードはOpus、実行はSonnet）。記録・集計・定型作業は `routine` サブエージェント（Haiku）、エスカレーション後は `escalation` サブエージェント（Opus）に任せる。
+- `.claude/hooks/loop_guard.py` が停止とエスカレーションの合図を出す。セッション開始・resume・`/clear` から60分（`LOOP_GUARD_LIMIT_MINUTES`）を超えると、Read系と `tasks/` への記録以外のツールを拒否する。同じテストの2回目の失敗、同じファイルの5回目の書き直し、ツールエラーの3連続でエスカレーション、同じテストの3回目の失敗かツールエラーの5連続で停止を指示する。しきい値は暫定値。
+- 状態は `.claude/state/`（Git管理外）に置く。テスト: `python3 -m unittest tests/test_loop_guard.py`。
 
 ## Architecture Boundaries
 
