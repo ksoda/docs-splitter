@@ -23,6 +23,11 @@
   - `PYTHONPATH=src python3 -m unittest tests/test_e2e.py`
 - 想定ランタイム: `python3` と標準ライブラリのみ。
 
+## Autonomous Loop
+
+- 自律ループはCLIのClaude Codeで動かす（例: `claude --remote-control "docs-splitter"`）。判断の根拠はdevelopment-disciplineの `docs/first-pilot-conditions.md`（N-05）。
+- 既定モデルは `opusplan`（計画モードはOpus、実行はSonnet）。記録・集計・定型作業は `routine` サブエージェント（Haiku）、エスカレーション後は `escalation` サブエージェント（Opus）に任せる。
+
 ## Architecture Boundaries
 
 - `adapters/`: 外部 I/O と境界検証を担当。ここで生データを受け、ドメイン型へ変換する。
