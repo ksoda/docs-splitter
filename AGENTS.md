@@ -89,3 +89,19 @@
 - この文書は「短く、プロジェクト固有情報中心」を維持する。
 - 新しい運用知見はこのファイルに追記し、重複する一般論は削除する。
 - セクション名は原則維持し、削除時は置換理由をコミットメッセージに残す。
+
+## 課題・Wiki・Skill抽出の運用
+
+- 課題状態の正本は `.tickets/`。既存の `tasks/` は判断・検証の根拠としてリンクする。
+- 着手時は `tk start ID`。Codexでは現在のセッションを自動で紐付ける。
+  自動紐付けができない場合は `tk bind ID codex|claude SESSION.jsonl` を実行する。
+  Claudeへ委譲した記録も、同じ課題へ明示的に追加できる。
+- 実装完了と仮説評価を分けてticketへ記録し、課題の受入条件を満たして判断を残した時に
+  `tk close ID --note "根拠と判断"`。停止時は `tk pause ID --note "停止理由"`。
+  時間・利用枠の上限による停止時は `--defer` を付け、追加のモデル呼出しをしない。
+- 課題の区切りで `wiki/` の知識・根拠・確認日を更新し、`tk index` で横断索引を更新する。
+  抽出失敗は課題の結果と別に記録される。後で `tk learn` で再試行する。
+- Skill候補は `tk skills list` / `tk skills show ID` で確認する。候補生成は正式採用ではない。
+  本人が内容を採用した後だけ `tk skills adopt ID --reviewed` を使う。
+  共通Skillを共有するにはdevelopment-disciplineの `scripts/install_links.py` を実行する。
+- 新しい要件・目標・予算の変更は、Wikiや生成Skillから自動的に採用しない。
