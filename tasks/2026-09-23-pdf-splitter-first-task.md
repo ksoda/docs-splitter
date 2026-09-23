@@ -1,6 +1,6 @@
 # 判断・検証記録: 初回試行 — 目次単位のPDF分割
 
-状態: 実施中（依存承認済み、実装再開）
+状態: 実装完了・実物PDFレビュー待ち（仮説検証は未完了）
 担当・決定者: Claude Code（実装・記録） / ユーザー（目的・仕様判断）
 開始日・レビュー条件: 2026-09-23。実装完了後、実物PDFの確認と利用後にレビューする。
 関連する決定ID: N-01〜N-05。development-discipline commit 15e2b37
@@ -48,7 +48,7 @@
 - 不確実性・証拠不足: 境界確認に要する時間、Notebookでの利用効果は未検証（実物PDFでの確認が別途必要）。
 - 予想との差: 未実施（実物PDF確認は別途、環境変数設定時のみ）。
 - 実装完了 / 未完了: 実装完了。`PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -p "test_*.py"` で25件のテストが成功（`tests/test_core.py` 14件、`tests/test_e2e.py` 4件、既存の`tests/test_loop_guard.py` 7件）。合成PDF (`tests/data/sample_magazine.pdf`) をpypdf/reportlabで作成しコミットした。CLIは分割定義JSON出力（既定）と、`--confirm-reviewed`確認後のみの分割PDF出力（`--split-output-dir`）を実装。元PDF非改変とテスト実行前後のSHA256一致、既存出力の上書き拒否(`OUTPUT_EXISTS`)を自動テストで検証済み。
-- 検証の判断: 実装受入条件（本節の「実装の受入条件と検証」）は満たしたと判断。ただし本課題全体の仮説検証（Notebook投入時の学習効果、実物PDFでの境界確認所要時間）は未実施で判断不能のまま。
+- 検証の判断: 実装受入条件（本節の「実装の受入条件と検証」）は満たしたと判断。Codexが同じ25件のテストを再実行し、全件成功した。本課題全体の仮説検証（Notebook投入時の学習効果、実物PDFでの境界確認所要時間）は未実施で判断不能のまま。PRD全体の充足も意味しない。あいまい一致候補と境界の縮小画像は未実装で、複数階層の層分けや承認履歴も初回実装に含めていない。
 - 次の行動: 実物PDFでの境界確認は環境変数設定時に別途実施。現時点では無人実行を停止し、実装結果をユーザーに報告する。
 - 判断者・日付・理由: Codex、2026-09-23、N-04／N-05の既存許可を見落とし、一般的なAGENTS.md記述を優先して誤停止したため。
 - 更新した仕様・用語・決定記録・手順: PRDとAGENTS.mdの依存条件をpypdf／reportlab許可に合わせ、追加依存の停止条件を修正（Codex）。本セッションでAGENTS.md（Project Snapshot/Runbook/Architecture Boundaries/Change Checklist/Gotchas）、README.md、SKILLS.mdをPDF分割の実装内容に合わせて更新し、venvセットアップ手順を追記した（Claude Sonnet 5）。破壊的変更: CLIの入出力JSONスキーマを`doc_id/max_tokens/pages/toc→chunks[]`から`doc_id/pdf_path/split_level/toc[]→units[]/unclassified[]/boundary_checks[]/review_items[]`へ全面変更し、`core/chunker.py`とトークン分割機能を撤去した。`TOKEN_LIMIT_EXCEEDED`エラーコードは廃止し、`TOC_RANGE_INCONSISTENT`/`PAGE_COVERAGE_ERROR`/`OUTPUT_EXISTS`/`REVIEW_REQUIRED`を新設。
