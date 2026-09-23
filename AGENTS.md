@@ -8,10 +8,17 @@
 - 思考は英語で行い、ユーザーへの応答は日本語で行う。
 - 技術用語は正確に使い、不要な言語混在を避ける。
 
+## Skill applicability
+
+- When debugging failures or unexpected results, use .claude/skills/systematic-debugging/SKILL.md before changing code.
+- Before reporting a task complete or checks passing, use .claude/skills/verified-delivery/SKILL.md and state requirement-level evidence and remaining gaps.
+- When creating or changing a project verification path, use .claude/skills/create-project-verification/SKILL.md.
+- To exercise this repository's PDF split CLI and retain evidence, use .claude/skills/verify-docs-splitter/SKILL.md.
+
 ## Project Snapshot
 
 - 目的: PDF の TOC（目次）を基準に、紙面を保ったまま階層単位の分割 PDF を出す CLI パイプライン。
-- 主要入力: JSON (`doc_id`, `pdf_path`, `split_level`, `toc[]`)。`toc` は `level`/`title`/`page_start` のフラットな一覧。
+- 主要入力: JSON (`doc_id`, `pdf_path`, `split_level`, `toc[]`)。`toc` は `level`/`title`/`page_start` のフラットな一覧。PDFアウトライン（しおり）は読み取らない。
 - 主要出力: 分割定義 JSON (`doc_id`, `total_pages`, `units[]`, `unclassified[]`, `boundary_checks[]`, `review_items[]`)。
   `--split-output-dir` 指定時は、人手確認済みの合図 (`--confirm-reviewed`) がある場合だけ分割 PDF も出す。
   失敗時は stderr に `DomainError.code` を出す。
@@ -26,8 +33,11 @@
 - CLI 実行:
   - `PYTHONPATH=src .venv/bin/python -m docs_splitter.cli --input tests/data/input_ok.json --output /tmp/plan.json`
   - 分割PDFも出す場合: 上記に `--split-output-dir /tmp/split --confirm-reviewed` を追加。
-- テスト:
-  - `PYTHONPATH=src .venv/bin/python -m unittest tests/test_core.py tests/test_e2e.py`
+- プロジェクト検証（リポジトリ直下で新しい証拠先を指定）:
+  - .venv/bin/python scripts/verify_project.py --output-dir /tmp/docs-splitter-evidence-20260923-run-01
+  - 証拠先が既にあると停止するため、毎回異なる未使用のパスを使う。
+- 全テスト:
+  - PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -p 'test_*.py'
 - 想定ランタイム: `python3`（`.venv` 経由）、標準ライブラリ、pypdf。
   reportlabも許可済み（主に合成PDFフィクスチャ生成用）。その他の依存追加はdevelopment-disciplineのN-05に従う。
 
