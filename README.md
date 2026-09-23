@@ -1,17 +1,10 @@
-# PDF構造分解パイプライン
+# PDF目次分割パイプライン
 
 ## 概要
 
-本プロジェクトは、PDFの目次（TOC）を基準に文書を階層構造へ分解し、
-ユーザが処理可能な情報単位（チャンク）へ変換するエンジンである。
-
-対象用途：
-
-- 音声化（TTS）
-- 要約生成
-- 外部LLM処理
-- ベクトル検索
-- 学習支援
+本プロジェクトは、PDFの目次（TOC）を基準に、紙面をそのまま保った
+分割PDFを取り出すCLIである。テキストのトークンチャンク化は行わない
+（撤去済み）。
 
 詳細な要求仕様は `PRD.md`、設計契約は `DESIGN_SPEC.md` を参照。
 
@@ -19,19 +12,30 @@
 
 ## スコープ
 
-- 書籍形式PDF
-- 目次付きPDF
-- CLI / API利用前提
+- 目次付きPDF（書籍・雑誌）
+- CLI利用前提
 - UIは提供しない
+- 元PDFは変更せず、既存の出力ファイルも上書きしない
 
 ---
 
 ## アーキテクチャ概要
 
-- `adapters`: 外部入出力とデータ正規化
-- `core`: ドメインモデルと純粋変換
+- `adapters`: 外部入出力（JSON、pypdf経由のPDF読み書き）とデータ検証
+- `core`: ドメインモデルと純粋変換（TOCからのユニット算定、境界照合）
 - `pipeline`: 処理順序制御とエラー伝播
-- `services`: 外部連携と再試行/タイムアウト制御
+
+---
+
+## セットアップ
+
+system の `python3` は externally-managed のため、pypdf/reportlab は
+プロジェクト専用venvに入れる。
+
+```bash
+uv venv .venv
+uv pip install --python .venv/bin/python pypdf reportlab
+```
 
 ---
 
@@ -40,18 +44,35 @@
 価値検証しやすい最小経路として、以下を E2E で実装済み。
 
 - 入力JSONの境界検証
-- TOCページ範囲の正規化
-- トークン上限制約を満たすチャンク分割
-- エラー分類付きのJSON出力
+- 選択したTOC階層(`split_level`)からのユニット・未分類ページ算定と全ページ被覆検証
+- ページ本文とTOCタイトルの境界照合（空白除去完全一致のみ自動一致）
+- 不一致・未分類隣接境界・層ごとの標本一致境界を人手確認対象として選定
+- 確認済み合図 (`--confirm-reviewed`) がある場合のみ、分割PDFを新規出力
+- エラー分類付きのJSON出力（分割定義のみのモードがデフォルト）
 
-実行例:
+実行例（分割定義のみ）:
 
 ```bash
-PYTHONPATH=src python3 -m docs_splitter.cli --input tests/data/input_ok.json --output /tmp/output.json
+PYTHONPATH=src .venv/bin/python -m docs_splitter.cli \
+  --input tests/data/input_ok.json --output /tmp/plan.json
+```
+
+実行例（人手確認後、分割PDFも出す）:
+
+```bash
+PYTHONPATH=src .venv/bin/python -m docs_splitter.cli \
+  --input tests/data/input_ok.json --output /tmp/plan.json \
+  --split-output-dir /tmp/split --confirm-reviewed
 ```
 
 テスト:
 
 ```bash
-PYTHONPATH=src python3 -m unittest tests/test_e2e.py
+PYTHONPATH=src .venv/bin/python -m unittest tests/test_core.py tests/test_e2e.py
+```
+
+合成PDFフィクスチャ (`tests/data/sample_magazine.pdf`) の再生成:
+
+```bash
+.venv/bin/python tests/fixtures/make_sample_pdf.py
 ```
